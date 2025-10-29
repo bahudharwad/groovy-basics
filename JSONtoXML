@@ -1,0 +1,26 @@
+
+JSONtoXML------>>>>>>>>>>[JSONtoXML]
+input--->>>
+[
+    {
+        "Name": "SANU Kumar",
+        "EmpId": "Abc8943",
+        "UserId": "8627",
+        "DOB": "1998-04-22",
+        "Email": "krsanu@yahoo.com",
+        "Phone": "8498002008",
+        "Address": "901 ABC Road Pokharai",
+        "City": "Kolkata WB IND 700014",
+        "Result": "F"
+    },
+    {
+        "Name": "SI HUSANU",
+        "EmpId": "yvjc8943",
+        "UserId": "9627",
+        "DOB": "1988-04-22",
+        "Email": "husanu@yahoo.com",
+        "Phone": "8002008",
+        "Address": "1 KK Road DCBlock",
+        "City": "DC NZ USA 867014",
+        "Result": "P"
+    }
