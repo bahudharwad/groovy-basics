@@ -24,3 +24,106 @@ input--->>>
         "City": "DC NZ USA 867014",
         "Result": "P"
     }
+
+
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.MarkupBuilder
+import groovy.json.*
+def Message JSONtoXML(Message message) {
+    def body = message.getBody(java.lang.String)
+    def jsonBody = new JsonSlurper().parseText(body)
+    def writer = new StringWriter()
+    def builder = new MarkupBuilder(writer)
+    builder.root {
+        jsonBody.each { data ->
+            user {
+                Name(data.Name.take(4))
+                EmpId(data.EmpId)
+                UserId(data.UserId)
+                DOB(data.DOB.replace("-","/"))
+                Email(data.Email)
+                Phone(data.Phone)
+                Address(data.Address)
+                City(data.City)
+                Result(data.Result)
+            }
+        }
+    }
+    message.setBody(writer.toString())
+    return message
+}
+
+
+JSONtoCSV------>>>>>>>>>>[JSONtoCSV]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.json.JsonSlurper
+def Message JSONtoCSV(Message message) {
+    def body = message.getBody(java.lang.String)
+    def jsonBody = new JsonSlurper().parseText(body)
+    def csv = "Name, UserID, DOB, Email, Phone\n"
+    jsonBody.each { it-> 
+        def name = it.Name
+        def userId = it.UserId
+        def dob = it.DOB
+        def email = it.Email
+        def phone = it.Phone
+        csv += "${name},${userId},${dob},${email},${phone}\n"
+    }
+    message.setBody(csv)
+    return message
+}
+CSVtoJSON------>>>>>>>>>>[CSVtoJSON] {Not_Important}
+input--->>>
+
+Name,UserID,DOB,Email,Phone
+SANU Kumar,8627,1998-04-22,krsanu@yahoo.com,8498002008
+SI HUSANU,9627,1988-04-22,husanu@yahoo.com,8002008
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.json.JsonBuilder
+def Message CSVtoJSON(Message message) {
+    def body = message.getBody(String)
+    def lines = body.split("\n")
+    def headers = lines[0].split(",").collect{it.trim()}
+    def data = []
+    lines.tail().each { line ->
+        def values = line.split(",").collect{it.trim()}
+        def row = [:]
+        headers.eachWithIndex { key, i ->
+            row[key] = values[i]
+        }
+        //data << row
+        data.add(row)
+    }
+    def json = new JsonBuilder(data)
+    message.setBody(json.toPrettyString())
+    return message
+}
+
+
+
+CSVtoXML------>>>>>>>>>>[CSVtoXML] {Not_Important}
+
+import com.sap.gateway.ip.core.customdev.util.Message
+def Message CSVtoXML(Message message) {
+    def body = message.getBody(java.lang.String)
+    def lines = body.split("\n")
+    def headers = lines[0].split(",").collect { it.trim() }   
+    def xml = new StringBuilder()
+    xml << "<Records>\n"  
+    lines.tail().each { line ->
+        def values = line.split(",").collect { it.trim() }
+        xml << "  <Record>\n"
+        headers.eachWithIndex { header, i ->
+            xml << "    <${header}>${values[i]}</${header}>\n"
+        }
+        xml << "  </Record>\n"
+    } 
+    xml << "</Records>"
+    message.setBody(xml.toString())
+    return message
+}
+
+
