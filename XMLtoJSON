@@ -1,0 +1,34 @@
+
+XMLtoJSON------>>>>>>>>>>[XMLtoJSON]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.json.JsonBuilder
+def Message XMLtoJSON(Message message){
+    def body = message.getBody(java.lang.String)
+    def xmlBody = new XmlParser().parseText(body)
+    def Data = []
+    xmlBody.BasicInfo.each{it->
+    def rating = it.rating.text()
+    def Result = ""
+    if (rating.toFloat() >= 3){
+            Result = "P"
+        } else {
+            Result = "F"
+        }
+    def jsonOutput = [
+        Name : it.name.text().split("_")[1..0].join(" "),
+        EmpId : it.empId.text(),
+        UserId : it.seqId.text().split("_")[0],
+        DOB : it.seqId.text().split("_")[1..3].join("-"),
+        Email : it.email.text().replace(".gmail.com","@yahoo.com"),
+        Phone : it.phone.text().replace("+91 0",""),
+        Address : it.address.text().replace("_"," "),
+        City : it.address2.text().replace("_"," "),
+        Result : Result      
+    ]
+    Data.add(jsonOutput)
+    }
+    def json = new JsonBuilder(Data)
+    message.setBody(json.toPrettyString())
+    return message
+}
