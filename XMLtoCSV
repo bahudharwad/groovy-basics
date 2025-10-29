@@ -1,0 +1,32 @@
+
+XMLtoCSV------>>>>>>>>>>[XMLtoCSV]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+def Message XMLtoCSV(Message message){
+    def body = message.getBody(java.lang.String)
+    def xmlBody = new XmlParser().parseText(body)
+    def csv = "Name, UserId, EmpId, DOB, Phone, Address, City, State, Country, PIN, Result\n"
+    xmlBody.BasicInfo.each {it->
+    def name = it.name.text().split("_")[1..0].join(" ")
+    def userId = it.seqId.text().split("_")[0]
+    def empId = it.empId.text()
+    def dob = it.seqId.text().split("_")[1..3].join("-")
+    def phone = it.phone.text().replace("+91 0","")
+    def address = it.address.text().replace("_"," ")
+    def addressParts = it.address2.text().split("_")
+    def city = addressParts[0]
+    def state = addressParts[1]
+    def Country = addressParts[2]
+    def pin = addressParts[3]
+    def result = ""
+    def rating = it.rating.text()
+    if (rating.toBigDecimal() >= 3){
+        result = "P"
+    } else {
+        result = "F"
+    }
+    csv += "${name},${userId},${empId},${dob},${phone},${address},${city},${state},${Country},${pin},${result}\n"
+    }
+    message.setBody(csv)
+    return message
+}
