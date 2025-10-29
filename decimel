@@ -1,0 +1,43 @@
+mport com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.*
+import groovy.json.*
+import java.math.RoundingMode
+ 
+def Message processData(Message message) {
+ 
+    def body = message.getBody(String)
+    def xml = new XmlSlurper().parseText(body)
+ 
+    // Convert hh:mm:ss → decimal hours
+    def timeToDecimal = { timeStr ->
+        if (!timeStr || timeStr.trim() == '') return 0.0
+        def parts = timeStr.split(':')*.toInteger()
+        def (h, m, s) = parts
+        def total = h + (m / 60.0) + (s / 3600.0)
+        return total.setScale(2, RoundingMode.HALF_UP)   // ✅ correct rounding
+    }
+ 
+    def resultList = []
+ 
+    xml.select_response.row.each { row ->
+        def result = [
+            slno: row.slno.text(),
+            Empid: row.Empid.text(),
+            Attdate: row.Attdate.text(),
+            Worked_hours: timeToDecimal(row.Worked_hours.text()),
+            Nobreak_hours: timeToDecimal(row.Nobreak_hours.text()),
+            Overtime_hours: timeToDecimal(row.Overtime_hours.text()),
+            Undertime_hours: timeToDecimal(row.Undertime_hours.text()),
+            Projectid: row.Projectid.text(),
+            Projectname: row.Projectname.text(),
+            Status: row.Status.text()
+        ]
+        resultList << result
+    }
+ 
+    def json = new groovy.json.JsonBuilder(resultList)
+    message.setBody(json.toPrettyString())
+    message.setHeader("Content-Type", "application/json")
+ 
+    return message
+}
