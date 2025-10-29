@@ -1,0 +1,140 @@
+--batch_mybatch
+Content-Type: multipart/mixed; boundary=changeset_mychangeset1
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "PerPerson('${property.UserID}')"
+    },
+    "customString2": "${property.candidateID}",
+    "customString3": "${property.jobID}",
+    "dateOfBirth": "/Date(${property.Btdt})/",
+    "personIdExternal": "${property.UserID}",
+    "userId": "${property.UserID}"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "EmpEmployment(personIdExternal='${property.UserID}',userId='${property.UserID}')"
+    },
+    "personIdExternal": "${property.UserID}",
+    "startDate": "/Date(${property.Stdt})/",
+    "userId": "${property.UserID}"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "EmpJob"
+    },
+    "company": "1000",
+    "customString7": "${property.email}",
+    "eventReason": "HIRNEW",
+    "managerId": "${property.ManagerUserID}",
+    "position": "${property.positionId}",
+    "startDate": "/Date(${property.Stdt})/",
+    "userId": "${property.UserID}"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "PerPersonal(personIdExternal='${property.UserID}',startDate=datetime'${property.StartDate}T00:00:00')"
+    },
+    "displayName": "${property.firstName} ${property.lastName}",
+    "firstName": "${property.firstName}",
+    "gender": "${property.Gender}",
+    "lastName": "${property.lastName}",
+    "nationality": "${property.Nationality}",
+    "personIdExternal": "${property.UserID}",
+    "salutation": "${property.Salutation}"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "EmpCompensation(startDate=datetime'${property.StartDate}T00:00:00',userId='${property.UserID}')"
+    },
+    "userId": "${property.UserID}",
+    "startDate": "/Date(${property.Stdt})/",
+    "eventReason": "HIRNEW"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "EmpPayCompRecurring(payComponent='1500',seqNumber=1L,startDate=datetime'${property.StartDate}T00:00:00',userId='${property.UserID}')"
+    },
+    "currencyCode": "BHD",
+    "frequency": "MON",
+    "payComponent": "1500",
+    "paycompvalue": "${property.Salary}",
+    "startDate": "/Date(${property.Stdt})/",
+    "userId": "${property.UserID}"
+}
+ 
+--changeset_mychangeset1
+Content-Type: application/http
+Content-Transfer-Encoding: binary
+ 
+POST upsert HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+ 
+{
+    "__metadata": {
+        "uri": "EmpPayCompRecurring(payComponent='1501',seqNumber=1L,startDate=datetime'${property.StartDate}T00:00:00',userId='${property.UserID}')"
+    },
+    "currencyCode": "BHD",
+    "frequency": "MON",
+    "payComponent": "1501",
+    "paycompvalue": "${property.MobileAllowance}",
+    "startDate": "/Date(${property.Stdt})/",
+    "userId": "${property.UserID}"
+}
+ 
+--changeset_mychangeset1--
+--batch_mybatch--
