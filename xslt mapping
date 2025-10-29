@@ -1,0 +1,50 @@
+
+Input XML ------->>>>>>>>
+
+<root>
+   <BasicInfo>
+      <seqId>8627_1998_04_22_IND</seqId>
+      <empId>Abc8943</empId>
+      <name>Kumar_SANU</name>
+      <email>krsanu.gmail.com</email>
+      <phone>+91 08498002008</phone>
+      <startDate>2024-01-23T01:30:00.000</startDate>
+      <address>901_ABC Road_Pokharai</address>
+      <address2>Kolkata_WB_IND_700014</address2>
+      <rating>2.98</rating>
+   </BasicInfo>
+   <BasicInfo>
+      <seqId>9627_1988_04_22_USA</seqId>
+      <empId>yvjc8943</empId>
+      <name>HUSANU_SI</name>
+      <email>husanu.gmail.com</email>
+      <phone>+91 08002008</phone>
+      <startDate>2022-06-23T01:30:00.000</startDate>
+      <address>1_KK Road_DCBlock</address>
+      <address2>DC_NZ_USA_867014</address2>
+      <rating>3.6</rating>
+   </BasicInfo>
+</root>
+
+Sample XSLT mappi ------->>>>>>
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="3.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	<xsl:template match="/root">
+		<Info>
+            <xsl:for-each select="BasicInfo">
+                <Details>
+                    <SeqId><xsl:value-of select="substring(seqId, 0, 4)"/></SeqId>
+                    <SeqId2><xsl:value-of select="substring-before(seqId, '_')"/></SeqId2>
+                    <UserId><xsl:value-of select="empId"/></UserId>
+                    <EmailAddress><xsl:value-of select="replace(email, '.gmail', '@gmail')"/></EmailAddress>
+                    <Name><xsl:value-of select="replace(name, '_', ' ')"/></Name>
+                    <Phone><xsl:value-of select="phone"/></Phone>
+                    <Address><xsl:value-of select="concat(address, ' ', address)"/></Address>
+                    <Rating><xsl:value-of select="rating"/></Rating>
+                </Details>
+            </xsl:for-each>
+        </Info>
+	</xsl:template>
+</xsl:stylesheet>
+
