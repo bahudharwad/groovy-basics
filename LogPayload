@@ -1,0 +1,49 @@
+LogPayload------>>>>>>>>>>[LogPayload]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+def Message LogPayload(Message message){
+    def body = message.getBody(String)
+    def messageLog = messageLogFactory.getMessageLog(message)
+    if (messageLog != null){
+        messageLog.setStringProperty("Log","Printing Payload as Attachment")
+        messageLog.addAttachmentAsString("Payload",body,"test/plain")
+    }
+    return message
+}
+
+getSetProperty------>>>>>>>>>>[getSetProperty]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+def Message getSetProperty(Message message) {
+    def body = message.getBody(String)
+    def xmlBody = new XmlParser().parseText(body)
+    def properties = message.getProperties()
+    def result = properties.get("Result")
+    def user = xmlBody.user[0].name.text() ?: ""
+    def number = xmlBody.user[0].number.text() ? "Y" : "N"
+    message.setProperty('Marks', result)
+    message.setProperty('Name', user)
+    message.setProperty('Phone', number)
+    return message
+}
+
+updateTime------>>>>>>>>>>[updateTime]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import groovy.xml.XmlUtil
+def Message updateTime(Message message) {
+    def body = message.getBody(String)
+    def xmlBody = new XmlParser().parseText(body)
+    def formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS")
+    xmlBody.BasicInfo.each { info ->
+        def time = info.startDate.text();
+        def dateTime = LocalDateTime.parse(time, formatter)
+        def newDateTime = dateTime.plusHours(1).plusMinutes(30)
+        def formattedDateTime = newDateTime.format(formatter)
+        info.startDate[0].value = formattedDateTime
+    }
+    message.setBody(XmlUtil.serialize(xmlBody))
+    return message
+}
