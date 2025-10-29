@@ -1,3 +1,6 @@
+
+
+
 mport com.sap.gateway.ip.core.customdev.util.Message
 import groovy.xml.*
 import groovy.json.*
@@ -41,3 +44,37 @@ def Message processData(Message message) {
  
     return message
 }
+output
+[
+{
+"slno": "1",
+"Empid": "261",
+"Attdate": "2025-10-20",
+"Worked_hours": 8.17,
+"Nobreak_hours": 9.00,
+"Overtime_hours": 0.00,
+"Undertime_hours": 2.00,
+"Projectid": "PROJ-HO",
+"Projectname": "Jeddah Head Office",
+"Status": "Initial Record"
+}
+]
+
+tsask: mehagna 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ROOT>
+    <select_response>
+        <row>
+            <slno>1</slno>
+            <Empid>261</Empid>
+            <Attdate>2025-10-20</Attdate>
+            <Worked_hours>08:10:00</Worked_hours>
+            <Nobreak_hours>09:00:00</Nobreak_hours>
+            <Overtime_hours>00:00:00</Overtime_hours>
+            <Undertime_hours>02:00:00</Undertime_hours>
+            <Projectid>PROJ-HO</Projectid>
+            <Projectname>Jeddah Head Office</Projectname>
+            <Status>Initial Record</Status>
+        </row>
+    </select_response>
+</ROOT>
