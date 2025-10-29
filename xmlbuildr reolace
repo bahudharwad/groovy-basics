@@ -1,0 +1,52 @@
+
+XMLBuilder_Replace------>>>>>>>>>>[XMLBuilder_Replace]
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.MarkupBuilder
+def Message XMLBuilder_Replace(Message message) {
+    def body = message.getBody(java.lang.String)
+    def xmlBody = new XmlParser().parseText(body)
+    def writer = new StringWriter()
+    def builder = new MarkupBuilder(writer)
+    builder.userInfo {
+        xmlBody.BasicInfo.each { info ->
+            def seqIdParts = info.seqId.text().split("_")
+            def empId = info.empId.text()
+            def userId = info.seqId.text().take(4)
+            def dateOfBirth = seqIdParts[1..3].join("-")
+            def nation = seqIdParts[4]
+            def namePart = info.name.text().split("_")[0]
+            def phone = info.phone.text().replace("+91 0", "")
+            def mail = info.email.text().replace(".gmail.com", "@yahoo.com")
+            def addressParts = info.address.text().split("_")
+            def address1 = addressParts[0..2].join(" ")
+            def address2Parts = info.address2.text().split("_")
+            def city = address2Parts[0]
+            def state = address2Parts[1]
+            def pin = address2Parts[3]
+            def rating = info.rating.text()
+            def result = ""
+            if (rating.toFloat() >= 2) {
+                result = "P"
+            } else {
+                result = "F"
+            }
+            user {
+                EmpID(empId)
+                UserID(userId)
+                DateOfBirth(dateOfBirth)
+                Name(namePart)
+                Mobile(phone)
+                Email(mail)
+                Address(address1)
+                City(city)
+                State(state)
+                Nation(nation)
+                PIN(pin)
+                Result(result)
+            }
+        }
+    }
+    message.setBody(writer.toString())
+    return message
+}
