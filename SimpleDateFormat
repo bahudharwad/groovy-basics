@@ -1,0 +1,57 @@
+//program that builds XML without using builder and StringWriter
+
+//input
+<root>
+    <EmployeeTime>
+        <UserId>6753654</UserId>
+        <Status>PENDING</Status>
+        <EndDate>2022-08-25T12:08:00.000</EndDate>
+    </EmployeeTime>
+    <EmployeeTime>
+        <UserId>6753654</UserId>
+        <Status>PENDING</Status>
+        <EndDate>2022-08-25T12:08:00.000</EndDate>
+    </EmployeeTime>
+</root>
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.text.SimpleDateFormat
+import java.util.Date
+
+def Message processData(Message message) {
+    def body = message.getBody(String)
+    def data = new XmlSlurper().parseText(body)
+
+    def curDate = new Date()
+    println curDate
+
+    def date = new SimpleDateFormat("yyyy-MM-dd")
+    def cDateFormatted = date.format(curDate)
+    def cDateParsed = date.parse(cDateFormatted)
+
+    def xmlString = '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n'
+
+    data.EmployeeTime.each { node ->
+        def uId = node.UserId.text()
+        def eDate = Date.parse("yyyy-MM-dd'T'HH:mm:ss.SSS", node.EndDate.text())
+
+        def sts
+        if (cDateParsed >= eDate) {
+            sts = 'COMPLETED'
+        } else {
+            sts = 'PENDING'
+        }
+
+        xmlString += "  <EmployeeTime>\n"
+        xmlString += "    <UserId>${uId}</UserId>\n"
+        xmlString += "    <Status>${sts}</Status>\n"
+        xmlString += "    <EndDate>${date.format(eDate)}</EndDate>\n"
+        xmlString += "  </EmployeeTime>\n"
+    }
+
+    xmlString += '</root>\n'
+
+    message.setBody(xmlString)
+
+    return message
+}
