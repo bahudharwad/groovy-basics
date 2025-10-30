@@ -11,6 +11,7 @@ Input_Payload------>>>>>>>>>>[Input_Payload]
       <address>901_ABC Road_Pokharai</address>
       <address2>Kolkata_WB_IND_700014</address2>
       <rating>2.98</rating>
+      <worktype>permenant</worktype>
    </BasicInfo>
    <BasicInfo>
       <seqId>9627_1988_04_22_USA</seqId>
