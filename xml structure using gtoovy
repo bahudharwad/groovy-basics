@@ -1,0 +1,29 @@
+import com.sap.gateway.ip.core.customdev.util.Message
+import groovy.xml.*
+
+def Message processData(Message message) {
+    def writer = new StringWriter()
+    def xml = new MarkupBuilder(writer)
+    xml.User {
+        Id("101")
+        Name("Bahu")
+        Dept("CPI")
+        fullname("bahubali")
+    }
+    xml.Emoploye{
+    Emoployee{
+        Id("101")
+        Name("Bahu")
+        Dept("CPI")
+        fullname("bahubali")
+    }
+    }
+xml.emp{
+    Emoploy{
+        EmpID("101")
+        Name("veeru")
+        Department("CPI")
+        fullname("bahubali")
+    message.setBody(writer.toString())
+    return message
+}
