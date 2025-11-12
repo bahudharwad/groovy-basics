@@ -1,0 +1,152 @@
+TASK: consider the earliest startTime,(MIN)
+
+AND the latest endTime(MAX)
+
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import groovy.xml.*
+ 
+Message processData(Message message) {
+ 
+    def body = message.getBody(String)
+    def xml = new XmlSlurper().parseText(body)
+ 
+    // yesterday's date
+    def yesterday = LocalDate.now().minusDays(1)
+    def dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    def yesterdayStr = yesterday.format(dateFormatter)
+ 
+    // build result
+    def result = new StringBuilder()
+    result.append("<Output>\n")
+ 
+    xml.EmployeeTimeSheet.each { sheet ->
+        def userId = sheet.userId.text()
+        def entries = sheet.employeeTimeSheetEntry.EmployeeTimeSheetEntry
+        def matchFound = false
+ 
+        result.append("  <Record>\n")
+ 
+        entries.each { entry ->
+            def entryDate = entry.startDate.text()
+            if (entryDate.startsWith(yesterdayStr)) {
+                matchFound = true
+                def startTime = entry.startTime.text()
+                def endTime = entry.endTime.text()
+                result.append("    <RecordFound>\n")
+                result.append("      <userId>${userId}</userId>\n")
+                result.append("      <startDate>${entryDate}</startDate>\n")
+                result.append("      <startTime>${startTime}</startTime>\n")
+                result.append("      <endTime>${endTime}</endTime>\n")
+                result.append("    </RecordFound>\n")
+            }
+        }
+ 
+        if (!matchFound) {
+            result.append("    <RecordNotFound>\n")
+            result.append("      <userId>${userId}</userId>\n")
+            result.append("      <startDate>${yesterdayStr}T00:00:00.000</startDate>\n")
+            result.append("    </RecordNotFound>\n")
+        }
+ 
+        result.append("  </Record>\n")
+    }
+ 
+    result.append("</Output>")
+    message.setBody(result.toString())
+    return message
+}
+
+
+PAYLOAD
+ 
+<EmployeeTimeSheet>
+  <EmployeeTimeSheet>
+    <endDate>2025-11-16T00:00:00.000</endDate>
+    <employeeTimeSheetEntry>
+      <EmployeeTimeSheetEntry>
+        <startTime>1970-01-01T10:26:00.000</startTime>
+        <endTime>1970-01-01T12:52:00.000</endTime>
+        <startDate>2025-11-11T00:00:00.000</startDate>
+      </EmployeeTimeSheetEntry>
+      <EmployeeTimeSheetEntry>
+        <startTime>1970-01-01T16:53:00.000</startTime>
+        <endTime>1970-01-01T18:53:00.000</endTime>
+        <startDate>2025-11-11T00:00:00.000</startDate>
+      </EmployeeTimeSheetEntry>
+    </employeeTimeSheetEntry>
+    <userId>101269</userId>
+    <startDate>2025-11-10T00:00:00.000</startDate>
+  </EmployeeTimeSheet>
+  <EmployeeTimeSheet>
+    <endDate>2025-11-16T00:00:00.000</endDate>
+    <employeeTimeSheetEntry/>
+    <userId>301948</userId>
+    <startDate>2025-11-10T00:00:00.000</startDate>
+  </EmployeeTimeSheet>
+  <EmployeeTimeSheet>
+    <endDate>2025-11-16T00:00:00.000</endDate>
+    <employeeTimeSheetEntry/>
+    <userId>104347</userId>
+    <startDate>2025-11-10T00:00:00.000</startDate>
+  </EmployeeTimeSheet>
+</EmployeeTimeSheet>
+ 
+
+ 
+import com.sap.gateway.ip.core.customdev.util.Message
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import groovy.xml.*
+Message processData(Message message) {
+    def body = message.getBody(String)
+    def xml = new XmlSlurper().parseText(body)
+    // yesterday's date
+    def yesterday = LocalDate.now().minusDays(1)
+    def dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    def yesterdayStr = yesterday.format(dateFormatter)
+    def result = new StringBuilder()
+    result.append("<Output>\n")
+    xml.EmployeeTimeSheet.each { sheet ->
+        def userId = sheet.userId.text()
+        def entries = sheet.employeeTimeSheetEntry.EmployeeTimeSheetEntry
+        def matchedEntries = []
+        // collect all entries for yesterday
+        entries.each { entry ->
+            def entryDate = entry.startDate.text()
+            if (entryDate.startsWith(yesterdayStr)) {
+                matchedEntries << entry
+            }
+        }
+        result.append("  <Record>\n")
+        if (matchedEntries && matchedEntries.size() > 0) {
+            // collect all start and end times
+            def startTimes = matchedEntries.collect { it.startTime.text() }.sort()
+            def endTimes = matchedEntries.collect { it.endTime.text() }.sort()
+            def earliestStartTime = startTimes.first()
+            def latestEndTime = endTimes.last()
+            def entryDate = matchedEntries[0].startDate.text()
+            def endDate = sheet.endDate.text()
+            result.append("    <RecordFound>\n")
+            result.append("      <userId>${userId}</userId>\n")
+            result.append("      <startDate>${entryDate}</startDate>\n")
+            result.append("      <startTime>${earliestStartTime}</startTime>\n")
+            result.append("      <endTime>${latestEndTime}</endTime>\n")
+            result.append("      <endDate>${endDate}</endDate>\n")
+            result.append("    </RecordFound>\n")
+        } else {
+            // no entries for yesterday
+            result.append("    <RecordNotFound>\n")
+            result.append("      <userId>${userId}</userId>\n")
+            result.append("      <startDate>${yesterdayStr}T00:00:00.000</startDate>\n")
+            result.append("    </RecordNotFound>\n")
+        }
+        result.append("  </Record>\n")
+    }
+    result.append("</Output>")
+    message.setBody(result.toString())
+    return message
+}
+ 
+ 
